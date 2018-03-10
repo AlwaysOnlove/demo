@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- 因为所有的配置文件都是放在resource中 并且要求hbm.xml文件和实体类放在同一个包下 所以在resource中建立相同名称的包名-->
+<hibernate-mapping>
+	<class name="com.itheima.ssh1.domain.User" table="USER">
+		<id name="id" type="java.lang.Integer">
+			<column name="ID"></column>				
+			<generator class="native"/>
+		</id>
+		<property name="username" type="java.lang.String">
+			<column name="USERNAME"></column>
+		</property>
+		<property name="password" type="java.lang.String">
+			<column name="PASSWORD"></column>
+		</property>
+	</class>
+</hibernate-mapping>

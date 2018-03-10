@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+<!-- 倒着写 需要什么写什么 首先开启注解事务 开启事务需要事务管理器(hibernateTransactionManager)  事务管理器要运行依赖注入会话工厂sessionFactory(LocalSessionFactory) 
+所以去注册一个会话工厂 注册会话工厂需要数据源 所以去注册一个数据源(comboPooledDataSource)-->
+	
+	<!-- 注册数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<!-- 数据源注入属性 -->
+		<property name="jdbcUrl" value="jdbc:mysql:///ssh1"></property>
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="password" value="123"></property>
+		<property name="user" value="root"></property>
+	</bean>
+	
+	<!-- 注册会话工厂 运行的时候会加载hibernate的配置文件-->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource"></property>
+		
+		<!-- 在sessionFactory节点中使用属性配置替代hibernate.xml文件 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.connection.isolation">4</prop>
+			</props>		
+		</property>
+		<!--  进行优化 spring将hibernate的配置文件可以放在sessionFactory节点这里
+		告诉会话工厂hibernate配置文件在哪
+		<property name="configLocations">
+			<array>
+				<value>classpath:hibernate.cfg.xml</value>
+			</array>
+		</property> -->
+		<!-- 配置User.hbm.xml文件位置 -->
+		<property name="mappingResources">
+			<array>
+				<value>com/itheima/ssh1/domain/User.hbm.xml</value>
+			</array>
+		</property>
+		
+	</bean>
+	<!-- 注册事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<!-- 注入会话工厂 -->
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!-- 开启事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+</beans>
